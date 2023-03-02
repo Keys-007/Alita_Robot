@@ -1,4 +1,5 @@
 from pyrogram import filters
+from pyrogram.enums import ParseMode
 from pyrogram.types import CallbackQuery, Message
 
 from alita import LOGGER
@@ -43,19 +44,19 @@ async def get_formatting_info(_, q: CallbackQuery):
         await q.message.edit_text(
             tlang(q, "formatting.md_help"),
             reply_markup=kb,
-            parse_mode="html",
+            parse_mode=ParseMode.HTML,
         )
     elif cmd == "fillings":
         await q.message.edit_text(
             tlang(q, "formatting.filling_help"),
             reply_markup=kb,
-            parse_mode="html",
+            parse_mode=ParseMode.HTML,
         )
     elif cmd == "random_content":
         await q.message.edit_text(
             tlang(q, "formatting.random_help"),
             reply_markup=kb,
-            parse_mode="html",
+            parse_mode=ParseMode.HTML,
         )
 
     await q.answer()

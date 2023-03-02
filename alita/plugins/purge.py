@@ -1,5 +1,6 @@
 from asyncio import sleep
 
+from pyrogram.enums import ChatType
 from pyrogram.errors import MessageDeleteForbidden, RPCError
 from pyrogram.types import Message
 
@@ -11,7 +12,6 @@ from alita.utils.custom_filters import admin_filter, command
 
 @Alita.on_message(command("purge") & admin_filter)
 async def purge(c: Alita, m: Message):
-
     if m.reply_to_message:
         message_ids = list(range(m.reply_to_message.id, m.id))
 
@@ -57,7 +57,7 @@ async def purge(c: Alita, m: Message):
 
 @Alita.on_message(command("spurge") & admin_filter)
 async def spurge(c: Alita, m: Message):
-    if m.chat.type != "supergroup":
+    if m.chat.type != ChatType.SUPERGROUP:
         await m.reply_text(tlang(m, "purge.err_basic"))
         return
 
@@ -99,15 +99,13 @@ async def spurge(c: Alita, m: Message):
     group=9,
 )
 async def del_msg(c: Alita, m: Message):
-    if m.chat.type != "supergroup":
+    if m.chat.type != ChatType.SUPERGROUP:
+        await m.reply_text(tlang(m, "purge.err_basic"))
         return
 
     if m.reply_to_message:
         await m.delete()
-        await c.delete_messages(
-            chat_id=m.chat.id,
-            message_ids=m.reply_to_message.id,
-        )
+        await m.reply_to_message.delete()
     else:
         await m.reply_text(tlang(m, "purge.what_del"))
     return

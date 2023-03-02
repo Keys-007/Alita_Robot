@@ -3,6 +3,7 @@ from secrets import choice
 from traceback import format_exc
 
 from pyrogram import filters
+from pyrogram.enums import ChatMemberStatus
 from pyrogram.errors import RPCError
 from pyrogram.types import CallbackQuery, InlineKeyboardMarkup, Message
 
@@ -47,7 +48,6 @@ async def view_filters(_, m: Message):
 
 @Alita.on_message(command(["filter", "addfilter"]) & admin_filter & ~filters.bot)
 async def add_filter(_, m: Message):
-
     args = m.text.split(" ", 1)
     all_filters = db.get_all_filters(m.chat.id)
     actual_filters = {j for i in all_filters for j in i.split("|")}
@@ -158,13 +158,13 @@ async def rm_allfilters(_, m: Message):
 async def rm_allfilters_callback(_, q: CallbackQuery):
     user_id = q.from_user.id
     user_status = (await q.message.chat.get_member(user_id)).status
-    if user_status not in {"creator", "administrator"}:
+    if user_status not in {ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER}:
         await q.answer(
             "You're not even an admin, don't try this explosive shit!",
             show_alert=True,
         )
         return
-    if user_status != "creator":
+    if user_status != ChatMemberStatus.OWNER:
         await q.answer(
             "You're just an admin, not owner\nStay in your limits!",
             show_alert=True,
@@ -252,7 +252,7 @@ async def send_filter_reply(c: Alita, m: Message, trigger: str):
                 m.chat.id,
                 getfilter["fileid"],
                 reply_markup=button,
-                reply_to_message_id=m.message_id,
+                reply_to_message_id=m.id,
             )
         else:
             await (await send_cmd(c, msgtype))(
@@ -260,7 +260,7 @@ async def send_filter_reply(c: Alita, m: Message, trigger: str):
                 getfilter["fileid"],
                 caption=textt,
                 reply_markup=button,
-                reply_to_message_id=m.message_id,
+                reply_to_message_id=m.id,
             )
     except Exception as ef:
         await m.reply_text(f"Error in filters: {ef}")
@@ -271,7 +271,6 @@ async def send_filter_reply(c: Alita, m: Message, trigger: str):
 
 @Alita.on_message(filters.text & filters.group & ~filters.bot, group=69)
 async def filters_watcher(c: Alita, m: Message):
-
     chat_filters = db.get_all_filters(m.chat.id)
     actual_filters = {j for i in chat_filters for j in i.split("|")}
 

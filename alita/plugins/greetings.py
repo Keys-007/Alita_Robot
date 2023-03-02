@@ -2,6 +2,7 @@ from html import escape
 from secrets import choice
 
 from pyrogram import filters
+from pyrogram.enums import ChatMemberStatus, ChatType
 from pyrogram.errors import ChatAdminRequired, RPCError
 from pyrogram.types import ChatMemberUpdated, InlineKeyboardMarkup, Message
 
@@ -49,11 +50,11 @@ async def escape_mentions_using_curly_brackets_wl(
             username=(
                 "@" + (await escape_markdown(escape(user.username)))
                 if user.username
-                else (await (mention_html(escape(user.first_name), user.id)))
+                else (await mention_html(escape(user.first_name), user.id))
             ),
-            mention=await (mention_html(escape(user.first_name), user.id)),
+            mention=await mention_html(escape(user.first_name), user.id),
             chatname=escape(m.chat.title)
-            if m.chat.type != "private"
+            if m.chat.type != ChatType.PRIVATE
             else escape(user.first_name),
             id=user.id,
         )
@@ -237,10 +238,10 @@ async def cleannnnn(_, m: Message):
 
 @Alita.on_chat_member_updated(filters.group, group=69)
 async def member_has_joined(c: Alita, member: ChatMemberUpdated):
-
     if (
         not member.new_chat_member
-        or member.new_chat_member.status in {"banned", "left", "restricted"}
+        or member.new_chat_member.status
+        in {ChatMemberStatus.BANNED, ChatMemberStatus.LEFT, ChatMemberStatus.RESTRICTED}
         or member.old_chat_member
     ):
         return
@@ -255,7 +256,7 @@ async def member_has_joined(c: Alita, member: ChatMemberUpdated):
         if user.id == OWNER_ID:
             await c.send_message(
                 member.chat.id,
-                "Wew My Owner has also joined the chat!",
+                "Wew My Owner just joined the chat!",
             )
             return
         if banned_users:
@@ -307,7 +308,7 @@ async def member_has_joined(c: Alita, member: ChatMemberUpdated):
             disable_web_page_preview=True,
         )
         if jj:
-            db.set_cleanwlcm_id(int(jj.message_id))
+            db.set_cleanwlcm_id(jj.id)
     except RPCError as e:
         print(e)
         return
@@ -315,10 +316,10 @@ async def member_has_joined(c: Alita, member: ChatMemberUpdated):
 
 @Alita.on_chat_member_updated(filters.group, group=99)
 async def member_has_left(c: Alita, member: ChatMemberUpdated):
-
     if (
         member.new_chat_member
-        or member.old_chat_member.status in {"banned", "restricted"}
+        or member.old_chat_member.status
+        in {ChatMemberStatus.BANNED, ChatMemberStatus.RESTRICTED}
         or not member.old_chat_member
     ):
         return
@@ -370,7 +371,7 @@ async def member_has_left(c: Alita, member: ChatMemberUpdated):
             disable_web_page_preview=True,
         )
         if ooo:
-            db.set_cleangoodbye_id(int(ooo.message_id))
+            db.set_cleangoodbye_id(ooo.id)
         return
     except RPCError as e:
         print(e)

@@ -10,7 +10,7 @@ from traceback import format_exc
 LOG_DATETIME = datetime.now().strftime("%d_%m_%Y-%H_%M_%S")
 LOGDIR = f"{__name__}/logs"
 
-# Make Logs directory if it does not exits
+# Make Logs directory if it does not exists
 if not path.isdir(LOGDIR):
     mkdir(LOGDIR)
 
@@ -53,7 +53,7 @@ LOGGER.info("------------------------")
 LOGGER.info("|      Alita_Robot     |")
 LOGGER.info("------------------------")
 LOGGER.info(f"Owner: {Config.OWNER_ID}")
-LOGGER.info("Source Code: https://github.com/DivideProjects/Alita_Robot\n")
+LOGGER.info("Source Code: https://github.com/divkix/Alita_Robot\n")
 
 # Account Related
 BOT_TOKEN = Config.BOT_TOKEN
